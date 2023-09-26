@@ -1,0 +1,44 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mysql"
+  url      = env("DATABASE_URL")
+}
+
+model Employees {
+  id                          Int                           @id @default(autoincrement())
+  firstName                   String                        @db.VarChar(100)
+  lastName                    String                        @db.VarChar(100)
+  hireDate                    DateTime
+  phone                       String                        @db.VarChar(100)
+  address                     String                        @db.VarChar(200)
+  department                  Departments?                   @relation(fields: [departmentName], references: [name])
+  departmentName String
+  createdAt                   DateTime                      @default(now())
+  updatedAt                   DateTime                      @updatedAt
+  departmentHistory EmployeesDepartmentsHistory[]
+  isActive Boolean @default(true)
+}
+
+model Departments {
+  id         Int        @id @default(autoincrement())
+  name                        String                        @unique @db.VarChar(100)
+  createdAt                   DateTime                      @default(now())
+  updatedAt                   DateTime                      @updatedAt
+  employees                   Employees[]
+  employeesDepartmentHistory EmployeesDepartmentsHistory[]
+}
+
+model EmployeesDepartmentsHistory {
+  id           Int         @id @default(autoincrement())
+  employee     Employees   @relation(fields: [employeeId], references: [id], onDelete: Cascade)
+  employeeId   Int         
+  department   Departments @relation(fields: [departmentName], references: [name])
+  departmentName String
+  createdAt    DateTime    @default(now())
+}
